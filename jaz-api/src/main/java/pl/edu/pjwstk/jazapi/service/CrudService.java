@@ -1,20 +1,23 @@
 package pl.edu.pjwstk.jazapi.service;
 
-import org.springframework.data.repository.CrudRepository;
-
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 public abstract class CrudService<T extends DbEntity> {
-    CrudRepository<T, Long> repository;
+    JpaRepository<T, Long> repository;
 
-    public CrudService(CrudRepository<T, Long> repository) {
+    public CrudService(JpaRepository<T, Long> repository) {
         this.repository = repository;
     }
 
-    public List<T> getAll() {
-        Iterable<T> items = repository.findAll();
+    public List<T> getAll(int page, int size, String sort) {
+        PageRequest pageRequest = PageRequest.of(page, size, Sort.by(sort).ascending());
+
+        Iterable<T> items = repository.findAll(pageRequest);
         var itemList = new ArrayList<T>();
 
         items.forEach(itemList::add);
